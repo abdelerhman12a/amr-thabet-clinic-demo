@@ -34,7 +34,7 @@ h1 span{font-weight:300;color:#5f7a90}
 .note{margin-top:26px;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid #e1e9f0;font-size:12.5px;color:#5a6f7d;line-height:1.7}
 footer{background:var(--navy-d);color:#cfdceb;padding:26px 0;font-size:12.5px;text-align:center}
 .filters{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin-top:25px;padding:18px;background:#fff;border:1px solid #dbe5ee;border-radius:18px}.filters label{display:grid;gap:5px;font-size:13px;font-weight:700;color:var(--navy-d);flex:1;min-width:160px}.filters input{font:inherit;min-width:0;width:100%;height:46px;padding:7px 10px;border:1px solid #bfcedb;border-radius:10px;background:#f7f9fc;color:var(--navy-d);direction:ltr}.filters button{font:inherit;font-size:13px;min-height:46px;border:1px solid #c7d6e3;border-radius:10px;padding:8px 14px;background:#fff;color:var(--navy);cursor:pointer}.filters button[aria-pressed=true]{background:var(--navy);color:#fff}.filters p{flex-basis:100%;font-size:12.5px;color:#5a6f7d}.stats{margin-top:16px}button:focus-visible,input:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
-html{min-height:100%}body{min-height:100vh;display:flex;flex-direction:column}main,.wrap:last-of-type{flex:1 0 auto}footer{margin-top:auto}@media(min-width:900px){.back{font-size:14px}}
+html{min-height:100%}.qn{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 8px}.rl{font:inherit;font-size:12px;padding:4px 12px;border-radius:8px;border:1px solid #c9d3dc;background:#fff;color:var(--navy);text-decoration:none}.ac{flex-wrap:wrap}body{min-height:100vh;display:flex;flex-direction:column}main,.wrap:last-of-type{flex:1 0 auto}footer{margin-top:auto}@media(min-width:900px){.back{font-size:14px}}
 @media(max-width:600px){.filters label{flex:1 1 100%}.filters button{flex:1 1 0}}
 </style></head><body>
 <header>
@@ -51,7 +51,7 @@ html{min-height:100%}body{min-height:100vh;display:flex;flex-direction:column}ma
 <div class="filters"><label for="filterDate">حجوزات يوم<input type="date" id="filterDate"></label><button id="todayBtn" type="button">اليوم</button><button id="allBtn" type="button" aria-pressed="false">كل الحجوزات</button><p id="filterSummary" role="status" aria-live="polite"></p></div>
 <div class="stats" id="stats"></div>
 <div id="list"></div>
-<div class="note"><b>تنويه:</b> هذه لوحة عرض تجريبية ضمن نموذج مستقل غير تابع للعيادة. لا تُرسل الحجوزات لأي جهة، ولا تُعد تأكيدًا لموعد حقيقي.</div>
+<div class="note"><b>التذكيرات:</b> أزرار التذكير تفتح واتساب أو تطبيق الرسائل على جهازك برسالة جاهزة، وأنت من يضغط إرسال. لا يوجد إرسال تلقائي. رقم الدور محسوب من حجوزات هذا الجهاز فقط (ترتيب الوقت في اليوم).</div><div class="note"><b>تنويه:</b> هذه لوحة عرض تجريبية ضمن نموذج مستقل غير تابع للعيادة. لا تُرسل الحجوزات لأي جهة، ولا تُعد تأكيدًا لموعد حقيقي.</div>
 </div></main>
 <footer>نموذج تجريبي مستقل · الحجوزات والبيانات على هذا الجهاز فقط</footer>
 <script>const K='demo_requests';
@@ -76,10 +76,13 @@ function draw(){
   idx.forEach(([r,i])=>{
     const day=r.d||'بدون تاريخ محدد';
     if(day!==lastDay){html+='<div class="dh">'+esc(day)+'</div>';lastDay=day}
-    html+='<div class="rq"><div class="tp2"><div><b>'+esc(r.n)+'</b> <span dir="ltr">'+esc(r.p)+'</span></div>'+(r.td?'<div class="tm">'+esc(r.td)+'</div>':'')+'</div>'+(r.m?'<div class="mt">'+esc(r.m)+'</div>':'<div class="mt" style="opacity:.6">بدون ملاحظة</div>')+'<div class="ac"><button class="st2'+(r.s?' done':'')+'" data-i="'+i+'">'+(r.s?'تم التواصل':'جديد')+'</button><button class="dl" data-i="'+i+'">حذف</button></div></div>';
+    html+='<div class="rq"><div class="tp2"><div><b>'+esc(r.n)+'</b> <span dir="ltr">'+esc(r.p)+'</span></div>'+(r.td?'<div class="tm">'+esc(r.td)+'</div>':'')+'</div>'+(r.m?'<div class="mt">'+esc(r.m)+'</div>':'<div class="mt" style="opacity:.6">بدون ملاحظة</div>')+(r.date&&r.td?('<div class="qn">رقم الدور '+qInfo(all,r).num+' · قبله '+qInfo(all,r).ahead+'</div>'):'')+'<div class="ac"><button class="st2'+(r.s?' done':'')+'" data-i="'+i+'">'+(r.s?'تم التواصل':'جديد')+'</button><button class="dl" data-i="'+i+'">حذف</button>'+(r.date&&r.td?'<a class="rl" target="_blank" rel="noopener" href="https://wa.me/'+waNum(r.p)+'?text='+encodeURIComponent(remText(r,qInfo(all,r)))+'">تذكير واتساب (يدوي)</a><a class="rl" href="sms:'+esc(r.p)+'?&body='+encodeURIComponent(remText(r,qInfo(all,r)))+'">تذكير SMS (يدوي)</a>':'')+'</div></div>';
   });
   document.getElementById('list').innerHTML=html+'</div>';
 }
+function qInfo(all,r){const day=all.filter(x=>x.date===r.date).sort((x,y)=>(x.t||'').localeCompare(y.t||''));const i=day.findIndex(x=>x.t===r.t&&x.ts===r.ts);return{num:i+1,ahead:i,total:day.length}}
+function waNum(p){p=String(p||'').replace(/[^\d+]/g,'').replace(/^\+/,'');if(p.startsWith('00'))p=p.slice(2);if(p.startsWith('0'))p='20'+p.slice(1);return p}
+function remText(r,q){return 'تذكير بموعدك التجريبي عند د. عمرو ثابت يوم '+r.d+' الساعة '+r.td+'. رقمك في الدور '+q.num+(q.ahead?' وقبلك '+q.ahead+' حجز.':' وأنت أول حجز في اليوم.')+' (رسالة تجريبية)'}
 function setFilter(v){chosenDate=v;dateInput.value=v;sessionStorage.setItem('demo_filter_date',v);draw()}
 dateInput.onchange=()=>setFilter(dateInput.value);
 document.getElementById('todayBtn').onclick=()=>setFilter(today());
