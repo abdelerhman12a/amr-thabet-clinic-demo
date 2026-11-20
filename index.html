@@ -78,6 +78,14 @@ footer{background:var(--navy-d);color:#cfdceb;padding:44px 0 28px;font-size:14px
 #ok b{display:block;margin-bottom:2px}
 #ok a{color:var(--green);text-decoration:underline}
 
+/* Reference-inspired horizontal appointment calendar, original clinic colours. */
+.days{gap:10px;padding:3px 1px 12px;scrollbar-width:thin;scrollbar-color:#b7cadb transparent}
+.dy{flex:0 0 72px;min-width:72px;min-height:98px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 5px;border:1px solid #dbe5ef;border-radius:17px;transition:background .18s,color .18s}
+.dy b{font-size:24px;line-height:1.35}.dy small{display:block;font-size:11px;line-height:1.6}
+.dy:hover{border-color:var(--navy)}.dy.on{box-shadow:0 5px 14px #1b4f7f20}
+.sl{min-height:49px;border-radius:13px}.slots{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.sl{font-size:12px}
+@media(max-width:350px){.slots{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.dy:focus-visible,.sl:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
 /* clickable topic cards */
 button.card{font:inherit;text-align:right;border:0;cursor:pointer;width:100%;transition:transform .18s,box-shadow .18s}
 button.card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(11,37,64,.16)}
@@ -312,8 +320,8 @@ function renderDays(){
   for(let i=0;i<NDAYS;i++){
     const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
     const b=document.createElement('button');b.type='button';b.className='dy'+(selD===iso(d)?' on':'');
-    b.dataset.iso=iso(d);
-    b.innerHTML='<b>'+WD[d.getDay()]+'</b><small>'+d.getDate()+' '+MO[d.getMonth()]+'</small>';
+    b.dataset.iso=iso(d);b.setAttribute('aria-pressed',String(selD===iso(d)));b.setAttribute('aria-label',dlabel(d)+' '+d.getFullYear());
+    b.innerHTML='<small>'+WD[d.getDay()]+'</small><b>'+d.getDate()+'</b><small>'+(d.getMonth()+1)+'/'+d.getFullYear()+'</small>';
     b.onclick=()=>{selD=iso(d);selT=null;renderDays();renderSlots()};
     daysEl.appendChild(b);
   }
@@ -330,7 +338,7 @@ function renderSlots(){
     let past=false;
     if(selD===todayIso){const p=t.split(':');const st=new Date(now.getFullYear(),now.getMonth(),now.getDate(),+p[0],+p[1]);past=st.getTime()<now.getTime()+3600000}
     if(busy||past){b.className='sl busy';b.disabled=true;b.innerHTML='<s>'+tdisp(t)+'</s><i>'+(busy?'محجوز':'فات')+'</i>'}
-    else{avail++;b.className='sl'+(selT===t?' on':'');b.textContent=tdisp(t);b.onclick=()=>{selT=t;renderSlots()}}
+    else{avail++;b.className='sl'+(selT===t?' on':'');b.setAttribute('aria-pressed',String(selT===t));b.textContent=tdisp(t);b.onclick=()=>{selT=t;renderSlots()}}
     slotsEl.appendChild(b);
   });
   const dl=dlabel(new Date(selD+'T12:00:00'));
@@ -345,6 +353,7 @@ document.getElementById('f').onsubmit=e=>{
   if(!selT){err('اختر الساعة.');return}
   if(d.n.length<2){err('اكتب الاسم.');return}
   if(!/^(\+?20)?0?1[0125]\d{8}$|^0\d{9,10}$/.test(d.p)){err('رقم التليفون غير صحيح.');return}
+  if(g().some(r=>r.date===selD&&r.t===selT)){selT=null;renderSlots();err('الموعد اتحجز بالفعل في التجربة. اختر وقتًا آخر.');return}
   er.style.display='none';
   const dl=dlabel(new Date(selD+'T12:00:00'));
   const rec={n:d.n,p:d.p,date:selD,d:dl,t:selT,td:tdisp(selT),m:(d.m||'').trim(),s:0,ts:Date.now()};
