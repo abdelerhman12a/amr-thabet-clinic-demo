@@ -297,8 +297,12 @@ document.querySelectorAll('button.card').forEach(c=>c.addEventListener('click',(
   const t=document.getElementById(c.dataset.t);if(!t)return;
   mc.innerHTML='';mc.appendChild(t.content.cloneNode(true));
   ovl.hidden=false;document.body.style.overflow='hidden';
+  if(!pushed){history.pushState({m:1},'');pushed=true}
 }));
-function closeM(){ovl.hidden=true;document.body.style.overflow=''}
+let pushed=false;
+function hideM(){pushed=false;ovl.hidden=true;document.body.style.overflow=''}
+function closeM(){if(pushed)history.back();else hideM()}
+window.addEventListener('popstate',()=>{if(!ovl.hidden)hideM()});
 document.getElementById('mx').onclick=closeM;
 ovl.addEventListener('click',e=>{if(e.target===ovl)closeM()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ovl.hidden)closeM()});
