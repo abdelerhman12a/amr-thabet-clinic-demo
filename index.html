@@ -183,7 +183,7 @@ header .wrap{gap:10px}header .brand{flex:1;min-width:0}
 .visit-story .soft-fill{fill:var(--soft);stroke:none}
 .visit-story .sc{fill:none;stroke:var(--ink);stroke-width:4.5}
 .visit-story .care-accent{stroke:var(--accent)}
-.visit-story .draw{stroke-dasharray:1;stroke-dashoffset:1;animation:drawLine 9s ease-in-out infinite alternate}
+.visit-story .draw{stroke-dasharray:1;stroke-dashoffset:0;animation:drawIn 2.8s ease-out .4s backwards}
 .visit-story .float{transform-box:fill-box;transform-origin:center;animation:float 12s ease-in-out infinite}
 .visit-story .acc-fill{fill:var(--accent);stroke:none}
 .visit-story .sec-fill{fill:var(--secondary);stroke:none}
@@ -198,7 +198,7 @@ header .wrap{gap:10px}header .brand{flex:1;min-width:0}
 .visit-story .walker{offset-path:path("M 40 270 C 350 270 520 270 850 270 S 1450 270 1760 270");offset-rotate:0deg;animation:walking 45s linear infinite}
 .visit-story .walker-leg{transform-box:fill-box;transform-origin:top center;animation:walkLeg .8s ease-in-out infinite alternate}
 .visit-story .walker-leg:nth-child(2){animation-delay:-.4s}
-@keyframes drawLine{0%{stroke-dashoffset:1}35%,75%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}
+@keyframes drawIn{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes sceneAppear{to{opacity:1}}
 @keyframes groundFlow{to{stroke-dashoffset:-400}}
