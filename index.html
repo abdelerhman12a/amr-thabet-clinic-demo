@@ -113,6 +113,7 @@ button.card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(11,37,6
 .inkcap{font-size:11.5px;color:#8aa0b0;text-align:center;margin-top:8px}
 @media(min-width:900px){.inkcard{height:210px}}
 
+.qbox{margin:10px 0;padding:12px;border-radius:12px;background:#fff;border:1px solid #bfe0cf;text-align:center}.qbox span{display:block;font-size:13px}.qbox strong{display:block;font-size:38px;line-height:1.2}.qbox em{font-style:normal;font-size:13px}.rmd{margin:10px 0;padding:10px 12px;border-radius:12px;background:#fff;border:1px dashed #9db3c4;font-size:13px;line-height:1.7}.rmd p{margin:4px 0}.rmd small{display:block;color:#5a6f7d}
 </style>
 </head>
 <body>
@@ -348,6 +349,8 @@ function renderSlots(){
   const dl=dlabel(new Date(selD+'T12:00:00'));
   slnote.textContent=avail?('المتاح يوم '+dl+': '+avail+' موعدًا.'):('لا توجد مواعيد متاحة يوم '+dl+'. جرّب يومًا آخر.');
 }
+function qInfo(all,r){const day=all.filter(x=>x.date===r.date).sort((x,y)=>(x.t||'').localeCompare(y.t||''));const i=day.findIndex(x=>x.t===r.t&&x.ts===r.ts);return{num:i+1,ahead:i,total:day.length}}
+function reminderText(r,q){return 'تذكير بموعدك التجريبي عند د. عمرو ثابت يوم '+r.d+' الساعة '+r.td+'. رقمك في الدور '+q.num+(q.ahead?' وقبلك '+q.ahead+' حجز.':' وأنت أول حجز في اليوم.')+' (رسالة تجريبية)'}
 document.getElementById('f').onsubmit=e=>{
   e.preventDefault();
   const d=Object.fromEntries(new FormData(e.target));
@@ -363,7 +366,11 @@ document.getElementById('f').onsubmit=e=>{
   const rec={n:d.n,p:d.p,date:selD,d:dl,t:selT,td:tdisp(selT),m:(d.m||'').trim(),s:0,ts:Date.now()};
   const a=g();a.push(rec);sv(a);
   e.target.reset();
-  ok.innerHTML='<b>تم حفظ حجزك التجريبي: '+esc(dl)+' — '+esc(tdisp(selT))+'.</b>محفوظ على جهازك فقط كتجربة، ولم يُرسل لأي عيادة ولم يُحجز موعد حقيقي. تابعه من <a href="admin.html">لوحة الإدارة التجريبية</a>.';
+  const q=qInfo(a,rec);
+  ok.innerHTML='<b>تم حفظ حجزك التجريبي: '+esc(dl)+' — '+esc(tdisp(selT))+'.</b>'+
+   '<div class="qbox"><span>رقمك في الدور (تجريبي)</span><strong>'+q.num+'</strong><em>'+(q.ahead?('قبلك '+q.ahead+(q.ahead===1?' حجز':' حجوزات')+' في نفس اليوم'):'أنت أول حجز في هذا اليوم')+' · إجمالي حجوزات اليوم '+q.total+'</em></div>'+
+   '<div class="rmd"><b>معاينة رسالة التذكير:</b><p>'+esc(reminderText(rec,q))+'</p><small>هذه معاينة فقط. لم تُرسل أي رسالة واتساب أو SMS. الإرسال التلقائي الحقيقي يحتاج ربطًا رسميًا ومواقفة العيادة وتكلفة.</small></div>'+
+   'محفوظ على جهازك فقط كتجربة، ولم يُرسل لأي عيادة ولم يُحجز موعد حقيقي. الترتيب محسوب من حجوزات هذا المتصفح فقط وليس دورًا حقيقيًا في العيادة. تابعه من <a href="admin.html">لوحة الإدارة التجريبية</a>.';
   ok.style.display='block';
   selT=null;renderSlots();
 };
